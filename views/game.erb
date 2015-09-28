@@ -29,11 +29,11 @@
 
     <% if @show_dealer_hit_button %>
       <p>
-        <h5> The dealer has <%= calculate_total(session[:dealer_cards])%> and must hit. </h5>
-      <form id="dealer_hit" action="/game/dealer/hit" method='post'>
+      <h5> The dealer has <%= calculate_total(session[:dealer_cards])%> and must hit. </h5>
+        <form id="dealer_hit" action="/game/dealer/hit" method='post'>
           <input type='submit', class="btn btn-primary" value="Click to see dealer card &rarr;" />
-         </form>
-        </p>   
+        </form>
+      </p>   
     <% end %>
   </div>
 

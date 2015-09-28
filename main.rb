@@ -1,7 +1,9 @@
 require 'rubygems'
 require 'sinatra'
 
-set :sessions, true
+use Rack::Session::Cookie, :key => 'rack.session',
+                           :path => '/',
+                           :james => 'james' 
 
 BLACKJACK_AMOUNT = 21
 DEALER_MIN_HIT = 17
@@ -45,7 +47,6 @@ helpers do
         when 'A' then 'ace'
       end
     end
-
 
     "<img src='/images/cards/#{suit}_#{value}.jpg' class='card_image'>"
   end
@@ -110,6 +111,9 @@ post '/bet' do
   elsif params[:bet_amount].to_i > session[:player_pot].to_i
     @error = "Bet amount cannot exceed currrent player pot ($#{session[:player_pot]})"
     halt erb(:bet)
+  elsif params[:bet_amount].to_i < 0
+    @error = "Please make a valid bet."
+    halt erb(:bet)
   else
     session[:player_bet] = params[:bet_amount].to_i
     redirect '/game'
@@ -164,15 +168,15 @@ get '/game/dealer' do
 
   dealer_total = calculate_total(session[:dealer_cards])
 
-    if dealer_total == BLACKJACK_AMOUNT
-      loser!("The dealer hit blackjack!")
-    elsif dealer_total > BLACKJACK_AMOUNT
-      winner!("The dealer busted at #{dealer_total}")
-    elsif dealer_total >= DEALER_MIN_HIT
-      redirect '/game/compare'
-    else
-      @show_dealer_hit_button = true
-    end
+  if dealer_total == BLACKJACK_AMOUNT
+    loser!("The dealer hit blackjack!")
+  elsif dealer_total > BLACKJACK_AMOUNT
+    winner!("The dealer busted at #{dealer_total}")
+  elsif dealer_total >= DEALER_MIN_HIT
+    redirect '/game/compare'
+  else
+    @show_dealer_hit_button = true
+  end
 
     erb :game, layout: false      
 end
